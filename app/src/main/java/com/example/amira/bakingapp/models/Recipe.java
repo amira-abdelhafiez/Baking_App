@@ -57,4 +57,8 @@ public class Recipe {
     public void setSteps(ArrayList<Step> steps) {
         Steps = steps;
     }
+
+    public String toString(){
+        return "Name : " + getName() + " + " + getServings();
+    }
 }

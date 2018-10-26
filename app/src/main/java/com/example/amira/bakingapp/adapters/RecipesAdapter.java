@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,15 +42,25 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
-        holder.mRecipeNameTextView.setText(mRecipes[position].getName());
-        holder.mRecipeServingsTextView.setText(mRecipes[position].getServings());
+        String Name = (mRecipes[position].getName() == null) ? "No Name" : mRecipes[position].getName();
+        holder.mRecipeNameTextView.setText(Name);
+
+        int Servings = (mRecipes[position].getServings() <= 0) ? 0 : mRecipes[position].getServings();
+        holder.mRecipeServingsTextView.setText(Integer.toString(Servings));
 
         String imageUrl = mRecipes[position].getImage();
-        Picasso.with(mContext)
-                .load(imageUrl)
-                .placeholder(R.drawable.default_meal_image)
-                .error(R.drawable.default_meal_image)
-                .into(holder.mRecipeImageView);
+        Log.d("imageUrl" , imageUrl);
+        if(imageUrl != null || ! imageUrl.isEmpty()) {
+            Picasso.with(mContext)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.default_meal_image)
+                    .error(R.drawable.default_meal_image)
+                    .into(holder.mRecipeImageView);
+        }else{
+            Picasso.with(mContext)
+                    .load(R.drawable.default_meal_image)
+                    .into(holder.mRecipeImageView);
+        }
     }
 
     @Override
@@ -62,16 +74,15 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder{
 
-        @BindView(R.id.iv_recipe_image)
         ImageView mRecipeImageView;
-        @BindView(R.id.tv_recipe_name)
         TextView mRecipeNameTextView;
-        @BindView(R.id.tv_recipe_servings)
         TextView mRecipeServingsTextView;
 
         public RecipeViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(itemView);
+            mRecipeImageView = itemView.findViewById(R.id.iv_recipe_image);
+            mRecipeNameTextView = itemView.findViewById(R.id.tv_recipe_name);
+            mRecipeServingsTextView = itemView.findViewById(R.id.tv_recipe_servings);
         }
     }
 

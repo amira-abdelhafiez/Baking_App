@@ -1,6 +1,7 @@
 package com.example.amira.bakingapp.utils;
 
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class NetworkUtils {
         try{
             url = new URL(bakingDataUri.toString());
         }catch (MalformedURLException e){
-
+            Log.d(LOG_TAG , e.getStackTrace().toString());
         }
 
         return url;

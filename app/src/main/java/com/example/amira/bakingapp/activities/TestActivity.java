@@ -7,10 +7,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.amira.bakingapp.R;
@@ -25,9 +22,7 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
-
-    private static final String LOG_TAG = MainActivity.class.getSimpleName();
+public class TestActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
 
     private static final int RECIPES_LOADER_ID = 107;
 
@@ -35,38 +30,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private RecipesAdapter mAdapter;
 
-    @BindView(R.id.rv_recipes) RecyclerView mRecipesRecyclerView;
-    @BindView(R.id.pb_recipes) ProgressBar mLoadingProgressBar;
-
     private Recipe[] mRecipes;
+
+    @BindView(R.id.test_text)
+    TextView testText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_test);
 
         ButterKnife.bind(this);
 
-        mAdapter = new RecipesAdapter();
-        mRecipesRecyclerView.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL , false );
-        mRecipesRecyclerView.setLayoutManager(layoutManager);
-
-//
-//        mLoaderManager = getSupportLoaderManager();
-//        mLoaderManager.initLoader(RECIPES_LOADER_ID , null , this);
-        getRecipesData();
-
-    }
-
-    private void getRecipesData(){
-
-        Loader<String> recipesLoader = mLoaderManager.getLoader(RECIPES_LOADER_ID);
-        if(recipesLoader != null){
-            mLoaderManager.restartLoader(RECIPES_LOADER_ID , null , this);
-        }else{
-            mLoaderManager.initLoader(RECIPES_LOADER_ID , null , this);
-        }
+        LoaderManager lm = getSupportLoaderManager();
+        lm.initLoader(RECIPES_LOADER_ID , null , this);
     }
 
     @NonNull
@@ -120,14 +97,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+
         if(data != null && !data.isEmpty()) {
+            testText.setText(data);
             mRecipes = JsonUtils.ParseRecipesData(data);
-            Log.d("Data" , mRecipes.toString());
-            mAdapter.setmRecipes(mRecipes);
+
+            StringBuilder sb = new StringBuilder();
+            for (Recipe recipe : mRecipes)
+            {
+                   sb.append(recipe.toString() + "\n");
+            }
+            Log.d("Data" , sb.toString());
+            //mAdapter.setmRecipes(mRecipes);
         }else{
             Log.d("Data" , "Ya 7aywan msh tbgeeb el data  ");
         }
     }
+
 
     @Override
     public void onLoaderReset(@NonNull Loader<String> loader) {

@@ -46,4 +46,9 @@ public class Step {
     public String getThumbnail() {
         return Thumbnail;
     }
+
+
+    public String toString(){
+        return "Short Description is " + this.getShortDescription()  + " + "  + this.getId() + " \n";
+     }
 }

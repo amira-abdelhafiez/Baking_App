@@ -28,4 +28,8 @@ public class Ingredient {
     public double getQuantity() {
         return Quantity;
     }
+
+    public String toString(){
+        return "Name : " + getName() + " + " + getQuantity();
+    }
 }
