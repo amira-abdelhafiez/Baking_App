@@ -1,25 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <ImageView
-        android:layout_margin="@dimen/rv_item_image_margin"
         android:id="@+id/iv_recipe_image"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="3"/>
+        android:layout_width="@dimen/recipe_image_width"
+        android:layout_height="@dimen/recipe_image_height"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="@dimen/rv_recipes_margin"
+        android:src="@drawable/default_meal_image" />
 
-    <TextView
-        android:id="@+id/tv_recipe_name"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/iv_recipe_image"
+        android:layout_centerVertical="true"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/tv_recipe_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/recipe_test_name"/>
 
-    <TextView
-        android:id="@+id/tv_recipe_servings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/tv_recipe_servings"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="@string/testing_recipe"/>
+    </LinearLayout>
+
 
 </RelativeLayout>

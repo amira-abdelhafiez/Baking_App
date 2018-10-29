@@ -30,6 +30,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     private Context mContext;
 
+    private ItemOnClickHandler handler;
+
+    public RecipesAdapter(ItemOnClickHandler handler){
+        this.handler = handler;
+    }
     @NonNull
     @Override
     public RecipeViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -46,19 +51,21 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         holder.mRecipeNameTextView.setText(Name);
 
         int Servings = (mRecipes[position].getServings() <= 0) ? 0 : mRecipes[position].getServings();
+
+        String ServingText = "For " + Integer.toString(Servings) + " people";
         holder.mRecipeServingsTextView.setText(Integer.toString(Servings));
 
         String imageUrl = mRecipes[position].getImage();
-        Log.d("imageUrl" , imageUrl);
-        if(imageUrl != null || ! imageUrl.isEmpty()) {
+
+        if(imageUrl == null || imageUrl.equals("") || imageUrl.equals(" ")){
+            Picasso.with(mContext)
+                    .load(R.drawable.default_meal_image)
+                    .into(holder.mRecipeImageView);
+        }else{
             Picasso.with(mContext)
                     .load(imageUrl)
                     .placeholder(R.drawable.default_meal_image)
                     .error(R.drawable.default_meal_image)
-                    .into(holder.mRecipeImageView);
-        }else{
-            Picasso.with(mContext)
-                    .load(R.drawable.default_meal_image)
                     .into(holder.mRecipeImageView);
         }
     }
@@ -72,7 +79,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         }
     }
 
-    public class RecipeViewHolder extends RecyclerView.ViewHolder{
+    public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         ImageView mRecipeImageView;
         TextView mRecipeNameTextView;
@@ -83,11 +90,22 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
             mRecipeImageView = itemView.findViewById(R.id.iv_recipe_image);
             mRecipeNameTextView = itemView.findViewById(R.id.tv_recipe_name);
             mRecipeServingsTextView = itemView.findViewById(R.id.tv_recipe_servings);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            int position = getAdapterPosition();
+            handler.onClickItem(position);
         }
     }
 
     public void setmRecipes(Recipe[] recipes){
         mRecipes = recipes;
         notifyDataSetChanged();
+    }
+
+    public interface ItemOnClickHandler{
+        void onClickItem(int position);
     }
 }

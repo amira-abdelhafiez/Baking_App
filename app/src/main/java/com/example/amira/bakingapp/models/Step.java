@@ -1,11 +1,49 @@
 package com.example.amira.bakingapp.models;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+
+@Entity(tableName = "step")
 public class Step {
+
+    @PrimaryKey
+    @ColumnInfo(name = "_id")
     private int Id;
+    @ColumnInfo(name = "description")
     private String Description;
+    @ColumnInfo(name = "sDescription")
     private String ShortDescription;
+    @ColumnInfo(name = "video")
     private String Video;
+    @ColumnInfo(name = "thumbnail")
     private String Thumbnail;
+    @ForeignKey(entity = Recipe.class , parentColumns = "_id" , childColumns = "recipeId")
+    @ColumnInfo(name = "recipeId")
+    private int RecipeId;
+
+    @Ignore
+    public Step(){
+
+    }
+    public Step(int Id, String Description , String ShortDescription , String Video , String Thumbnail , int RecipeId){
+        this.Id = Id;
+        this.Description = Description;
+        this.ShortDescription = ShortDescription;
+        this.Video = Video;
+        this.Thumbnail = Thumbnail;
+        this.RecipeId = RecipeId;
+    }
+
+    public int getRecipeId() {
+        return RecipeId;
+    }
+
+    public void setRecipeId(int recipeId) {
+        RecipeId = recipeId;
+    }
 
     public void setId(int id) {
         Id = id;
@@ -46,9 +84,4 @@ public class Step {
     public String getThumbnail() {
         return Thumbnail;
     }
-
-
-    public String toString(){
-        return "Short Description is " + this.getShortDescription()  + " + "  + this.getId() + " \n";
-     }
 }

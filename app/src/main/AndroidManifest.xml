@@ -12,21 +12,27 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activities.MainActivity">
+        </activity>
+
+        <activity
+            android:name=".activities.SplashScreen"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_splash_screen"
+            android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.SplashScreen"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_splash_screen"
-            android:theme="@style/FullscreenTheme" />
         <activity android:name=".activities.StepDetailActivity" />
         <activity android:name=".activities.RecipeDetailActivity" />
         <activity android:name=".activities.TestActivity">
         </activity>
+        <provider
+            android:authorities="com.example.amira.bakingapp"
+            android:name="com.example.amira.bakingapp.data.BakingAppProvider"
+            android:exported="false" />
     </application>
 
 </manifest>
