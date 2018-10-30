@@ -1,6 +1,7 @@
 package com.example.amira.bakingapp.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
@@ -28,6 +29,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     private Recipe[] mRecipes;
 
+    private int numberOfItems;
+
     private Context mContext;
 
     private ItemOnClickHandler handler;
@@ -47,6 +50,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
+
         String Name = (mRecipes[position].getName() == null) ? "No Name" : mRecipes[position].getName();
         holder.mRecipeNameTextView.setText(Name);
 
@@ -57,17 +61,18 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
         String imageUrl = mRecipes[position].getImage();
 
-        if(imageUrl == null || imageUrl.equals("") || imageUrl.equals(" ")){
+        if (imageUrl == null || imageUrl.equals("") || imageUrl.equals(" ")) {
             Picasso.with(mContext)
                     .load(R.drawable.default_meal_image)
                     .into(holder.mRecipeImageView);
-        }else{
+        } else {
             Picasso.with(mContext)
                     .load(imageUrl)
                     .placeholder(R.drawable.default_meal_image)
                     .error(R.drawable.default_meal_image)
                     .into(holder.mRecipeImageView);
         }
+
     }
 
     @Override
@@ -102,10 +107,16 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     public void setmRecipes(Recipe[] recipes){
         mRecipes = recipes;
+        if(mRecipes == null){
+            this.numberOfItems = 0;
+        }else{
+            this.numberOfItems = recipes.length;
+        }
         notifyDataSetChanged();
     }
 
-    public interface ItemOnClickHandler{
+
+    public interface ItemOnClickHandler {
         void onClickItem(int position);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.amira.bakingapp.adapters;
 
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -14,16 +15,18 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     private onItemClickHandler handler;
 
     private int numberOfItems;
-    private Step[] mSteps;
+    private Cursor mStepCursor;
 
     public StepsAdapter(onItemClickHandler handler){
         this.handler = handler;
     }
 
-    public void setmSteps(Step[] mSteps) {
-        this.mSteps = mSteps;
-        if(mSteps != null){
-            this.numberOfItems = mSteps.length;
+    public void setmSteps(Cursor cursor) {
+        this.mStepCursor = cursor;
+        if(cursor != null){
+            this.numberOfItems = cursor.getCount();
+        }else{
+            this.numberOfItems = 0;
         }
     }
 
@@ -40,7 +43,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     @Override
     public int getItemCount() {
-        return 0;
+        return this.numberOfItems;
     }
 
     public interface onItemClickHandler{

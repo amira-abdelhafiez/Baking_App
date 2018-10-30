@@ -18,4 +18,7 @@ public interface RecipeDao {
 
     @Query("SELECT * FROM recipe WHERE _id = :Id")
     Cursor getRecipeById(int Id);
+
+    @Query("SELECT COUNT(*) FROM recipe")
+    int getCount();
 }

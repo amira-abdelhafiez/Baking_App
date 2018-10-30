@@ -3,6 +3,8 @@ package com.example.amira.bakingapp.activities;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -13,6 +15,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,7 +35,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String> , RecipesAdapter.ItemOnClickHandler{
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , RecipesAdapter.ItemOnClickHandler{
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -42,10 +45,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private RecipesAdapter mAdapter;
 
+    private int Id_Col , Name_Col , Servings_Col , Image_Col;
+
     @BindView(R.id.rv_recipes) RecyclerView mRecipesRecyclerView;
     @BindView(R.id.pb_recipes) ProgressBar mLoadingProgressBar;
+    @BindView(R.id.tv_recipes_loading_error) TextView mErrorLoadingMessage;
 
     private Recipe[] mRecipes;
+    private Cursor mRecipesCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,20 +83,37 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    private void showErrorMessage(){
+        mErrorLoadingMessage.setVisibility(View.VISIBLE);
+        mRecipesRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
+    private void hideErrorMessage(){
+        mErrorLoadingMessage.setVisibility(View.INVISIBLE);
+        mRecipesRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoadingBar(){
+        mLoadingProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void hideLoadingBar(){
+        mLoadingProgressBar.setVisibility(View.INVISIBLE);
+    }
+
     @NonNull
     @Override
-    public Loader<String> onCreateLoader(int id, @Nullable final Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
         if(id == RECIPES_LOADER_ID){
+            return new AsyncTaskLoader<Cursor>(this) {
 
-            return new AsyncTaskLoader<String>(this) {
-                @Nullable String mRecipesData = null;
-
+                Cursor mCursor;
                 @Override
                 protected void onStartLoading() {
                     super.onStartLoading();
-
-                    if(mRecipes != null){
-                        deliverResult(mRecipesData);
+                    showLoadingBar();
+                    if(mCursor != null){
+                        deliverResult(mCursor);
                     }else{
                         forceLoad();
                     }
@@ -97,51 +121,112 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 @Nullable
                 @Override
-                public String loadInBackground() {
-                    URL bakingUrl = NetworkUtils.buildBakingDataUrl();
-                    String data = null;
-                    try {
-                        data = NetworkUtils.getBakingData(bakingUrl);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return data;
+                public Cursor loadInBackground() {
+                    mCursor = getContentResolver().query(DataContract.RecipeEntry.CONTENT_URI ,
+                            null , null , null , null);
+
+                    return mCursor;
                 }
 
                 @Override
-                public void deliverResult(@Nullable String data) {
-                    mRecipesData = data;
+                public void deliverResult(@Nullable Cursor data) {
                     super.deliverResult(data);
+                    mCursor = data;
                 }
             };
-        }else{
-            return new AsyncTaskLoader<String>(this) {
-                @Nullable
-                @Override
-                public String loadInBackground() {
-                    return null;
-                }
-            };
+        }else {
+            return null;
         }
     }
 
     @Override
-    public void onLoadFinished(@NonNull Loader<String> loader, String data) {
-        if(data != null && !data.isEmpty()) {
-            mRecipes = JsonUtils.ParseRecipesData(data);
-            Log.d("Data" , mRecipes.toString());
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        if(data == null){
+            FetchData();
+        }else{
+            // populate data Cursor
+            getColumnIndicies(data);
+            convertCursorToArray(data);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+    }
+
+
+    private void FetchData(){
+        new GetRecipesDataQuery().execute();
+    }
+
+    private void getColumnIndicies(Cursor cursor){
+        if(cursor == null) return;
+        Id_Col = cursor.getColumnIndex(DataContract.RecipeEntry.ID_COL);
+        Name_Col = cursor.getColumnIndex(DataContract.RecipeEntry.NAME_COL);
+        Servings_Col = cursor.getColumnIndex(DataContract.RecipeEntry.SERVINGS_COL);
+        Image_Col = cursor.getColumnIndex(DataContract.RecipeEntry.IMAGE_COL);
+    }
+
+    private void convertCursorToArray(Cursor cursor){
+        if(cursor == null) return;
+        Recipe[] recipeList = new Recipe[cursor.getCount()];
+        Recipe recipe;
+        while(cursor.moveToNext()){
+            recipe = new Recipe();
+            recipe.setId(cursor.getInt(Id_Col));
+            recipe.setServings(cursor.getInt(Servings_Col));
+            recipe.setImage(cursor.getString(Image_Col));
+            recipe.setName(cursor.getString(Name_Col));
+            recipeList[cursor.getPosition()] = recipe;
+        }
+        mRecipes = recipeList;
+        mAdapter.setmRecipes(mRecipes);
+    }
+
+    public class GetRecipesDataQuery extends AsyncTask<Void , Void , String>{
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //showLoadingBar();
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            URL bakingUrl = NetworkUtils.buildBakingDataUrl();
+            String result = null;
+            try{
+                result = NetworkUtils.getBakingData(bakingUrl);
+            }catch(IOException e){
+                Log.d(LOG_TAG , e.getMessage());
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(String data) {
+            super.onPostExecute(data);
+            // Get the Data And Save it and send it to the Adapetr
+
+            if(data != null && !data.isEmpty()){
+                mRecipes = JsonUtils.ParseRecipesData(data);
+                mAdapter.setmRecipes(mRecipes);
+                new SaveDataQuery().execute();
+            }else{
+                Log.d(LOG_TAG , "Couldn't fetch Json Data");
+            }
+
+        }
+    }
+
+    public class SaveDataQuery extends AsyncTask<Void , Void ,Void>{
+
+        @Override
+        protected Void doInBackground(Void... voids) {
             saveData();
-            mAdapter.setmRecipes(mRecipes);
-        }else{
-            Log.d("Data" , "Data null or empty");
+            return null;
         }
     }
-
-    @Override
-    public void onLoaderReset(@NonNull Loader<String> loader) {
-
-    }
-
     private void saveData(){
         ContentResolver contentResolver = getContentResolver();
         ContentValues recipeValues;

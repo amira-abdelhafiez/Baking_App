@@ -2,6 +2,7 @@ package com.example.amira.bakingapp.activities;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -15,14 +16,12 @@ import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.Recipe;
 import com.example.amira.bakingapp.models.Step;
 
-public class RecipeDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<String>{
+public class RecipeDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private static final String LOG_TAG = RecipeDetailActivity.class.getSimpleName();
 
     private static final int DATA_LOADER_ID = 701;
-    private Recipe mCurrentRecipe;
-    private Ingredient[] mRecipeIngredients;
-    private Step[] mRecipeSteps;
+    Cursor mRecipeCursor , mIngredientCursor , mStepCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,41 +54,17 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
 
     @NonNull
     @Override
-    public android.support.v4.content.Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
-        if(id == DATA_LOADER_ID){
-            final Recipe mRecipe = null;
-            return new AsyncTaskLoader<String>(this) {
-
-                @Nullable
-                @Override
-                public String loadInBackground() {
-
-                    return null;
-                }
-
-                @Override
-                public void deliverResult(@Nullable String data) {
-                    super.deliverResult(data);
-                }
-            };
-        }else{
-            return null;
-        }
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+        return null;
     }
 
     @Override
-    public void onLoadFinished(@NonNull android.support.v4.content.Loader<String> loader, String data) {
-        int id = loader.getId();
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
 
-        if(id == DATA_LOADER_ID){
-
-        }else{
-
-        }
     }
 
     @Override
-    public void onLoaderReset(@NonNull android.support.v4.content.Loader<String> loader) {
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
 }
