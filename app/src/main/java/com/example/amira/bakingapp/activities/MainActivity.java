@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.tv_recipes_loading_error) TextView mErrorLoadingMessage;
 
     private Recipe[] mRecipes;
-    private Cursor mRecipesCursor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +69,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLoaderManager = getSupportLoaderManager();
         mLoaderManager.initLoader(RECIPES_LOADER_ID , null , this);
         getRecipesData();
-
     }
 
     private void getRecipesData(){
@@ -111,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 @Override
                 protected void onStartLoading() {
                     super.onStartLoading();
+                    hideErrorMessage();
                     showLoadingBar();
                     if(mCursor != null){
                         deliverResult(mCursor);
@@ -141,12 +140,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-        if(data == null){
+        if(data == null || data.getCount() == 0){
             FetchData();
+            Log.d(LOG_TAG , "Data Cursor Failed , Gop Fetch Data");
         }else{
             // populate data Cursor
             getColumnIndicies(data);
             convertCursorToArray(data);
+            Log.d(LOG_TAG , "Data Arrived Bu Cursor Now Parsing and the count is " + data.getCount());
         }
     }
 
@@ -169,7 +170,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void convertCursorToArray(Cursor cursor){
-        if(cursor == null) return;
+        if(cursor == null) {
+            hideLoadingBar();
+            showErrorMessage();
+            return;
+        }
         Recipe[] recipeList = new Recipe[cursor.getCount()];
         Recipe recipe;
         while(cursor.moveToNext()){
@@ -182,13 +187,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         mRecipes = recipeList;
         mAdapter.setmRecipes(mRecipes);
+        Log.d(LOG_TAG , "Data Parsed From Cursor and sent to the adaptor");
+        hideLoadingBar();
     }
 
     public class GetRecipesDataQuery extends AsyncTask<Void , Void , String>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //showLoadingBar();
+            hideErrorMessage();
+            showLoadingBar();
         }
 
         @Override
@@ -212,8 +220,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 mRecipes = JsonUtils.ParseRecipesData(data);
                 mAdapter.setmRecipes(mRecipes);
                 new SaveDataQuery().execute();
+                hideLoadingBar();
+                Log.d(LOG_TAG , "Data Arrived from the internet");
             }else{
                 Log.d(LOG_TAG , "Couldn't fetch Json Data");
+                hideLoadingBar();
+                showErrorMessage();
             }
 
         }
@@ -244,7 +256,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             ContentValues stepValues ;
             for(Step step : steps){
                 stepValues = new ContentValues();
-                stepValues.put(DataContract.StepEntry.ID_COL , step.getId());
+                //stepValues.put(DataContract.StepEntry.ID_COL , step.getId());
+                stepValues.put(DataContract.StepEntry.NUMBER_COL , step.getNumber());
                 stepValues.put(DataContract.StepEntry.S_DESCRIPTION_COL , step.getShortDescription());
                 stepValues.put(DataContract.StepEntry.DESCRIPTION_COL , step.getDescription());
                 stepValues.put(DataContract.StepEntry.VIDEO_COL , step.getVideo());
@@ -268,9 +281,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onClickItem(int position) {
         Intent intent = new Intent(MainActivity.this , RecipeDetailActivity.class);
-        int id = mRecipes[position].getId();
+        //int id = mRecipes[position].getId();
         // put the extra here
-        intent.putExtra(Intent.EXTRA_TEXT , id);
+        intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position]);
         startActivity(intent);
     }
 }

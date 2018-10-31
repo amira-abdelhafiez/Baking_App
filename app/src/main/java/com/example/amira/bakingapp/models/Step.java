@@ -9,9 +9,11 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(tableName = "step")
 public class Step {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "_id")
     private int Id;
+    @ColumnInfo(name = "number")
+    private int number;
     @ColumnInfo(name = "description")
     private String Description;
     @ColumnInfo(name = "sDescription")
@@ -35,6 +37,14 @@ public class Step {
         this.Video = Video;
         this.Thumbnail = Thumbnail;
         this.RecipeId = RecipeId;
+    }
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
     }
 
     public int getRecipeId() {

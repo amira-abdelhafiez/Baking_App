@@ -139,7 +139,7 @@ public class JsonUtils {
         if(jsonData != null){
             try{
                 JSONObject stepJson = new JSONObject(jsonData);
-                step.setId(stepJson.optInt(S_ID));
+                step.setNumber(stepJson.optInt(S_ID));
                 step.setDescription(stepJson.optString(S_DESCRIPTION));
                 step.setShortDescription(stepJson.optString(S_SHORT_DESCRIPTION));
                 step.setThumbnail(stepJson.optString(S_THUMBNAIL));

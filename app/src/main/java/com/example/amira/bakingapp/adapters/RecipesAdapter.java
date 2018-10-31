@@ -77,11 +77,7 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     @Override
     public int getItemCount() {
-        if(mRecipes == null){
-            return 0;
-        }else{
-            return mRecipes.length;
-        }
+        return this.numberOfItems;
     }
 
     public class RecipeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

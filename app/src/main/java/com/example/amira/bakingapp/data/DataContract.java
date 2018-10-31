@@ -35,6 +35,7 @@ public class DataContract {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(STEP_PATH).build();
 
         public static final String ID_COL = "_id";
+        public static final String NUMBER_COL = "number";
         public static final String DESCRIPTION_COL = "description";
         public static final String S_DESCRIPTION_COL = "sDescription";
         public static final String VIDEO_COL = "video";

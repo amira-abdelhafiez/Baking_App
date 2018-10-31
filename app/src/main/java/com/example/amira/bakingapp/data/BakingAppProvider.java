@@ -117,7 +117,7 @@ public class BakingAppProvider extends ContentProvider {
                 break;
             case INGREDIENT:
                 Ingredient ingredient = new Ingredient();
-                ingredient.setId(values.getAsInteger(DataContract.IngredientEntry.ID_COL));
+                //ingredient.setId(values.getAsInteger(DataContract.IngredientEntry.ID_COL));
                 ingredient.setName(values.getAsString(DataContract.IngredientEntry.NAME_COL));
                 ingredient.setQuantity(values.getAsDouble(DataContract.IngredientEntry.QUANTITY_COL));
                 ingredient.setMeasure(values.getAsString(DataContract.IngredientEntry.MEASURE_COL));
@@ -131,7 +131,8 @@ public class BakingAppProvider extends ContentProvider {
                 Step step = new Step();
                 step.setVideo(values.getAsString(DataContract.StepEntry.VIDEO_COL));
                 step.setThumbnail(values.getAsString(DataContract.StepEntry.THUMBNAIL_COL));
-                step.setId(values.getAsInteger(DataContract.StepEntry.ID_COL));
+                step.setNumber(values.getAsInteger(DataContract.StepEntry.NUMBER_COL));
+                step.setNumber(values.getAsInteger(DataContract.StepEntry.NUMBER_COL));
                 step.setRecipeId(values.getAsInteger(DataContract.StepEntry.RECIPE_ID_COL));
                 step.setDescription(values.getAsString(DataContract.StepEntry.DESCRIPTION_COL));
                 step.setShortDescription(values.getAsString(DataContract.StepEntry.S_DESCRIPTION_COL));
