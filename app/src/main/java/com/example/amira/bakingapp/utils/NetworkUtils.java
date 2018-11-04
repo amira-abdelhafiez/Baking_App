@@ -66,4 +66,9 @@ public class NetworkUtils {
             con.disconnect();
         }
     }
+
+    public static Uri buildVideoUri(String str){
+        Uri uri = Uri.parse(str).buildUpon().build();
+        return uri;
+    }
 }

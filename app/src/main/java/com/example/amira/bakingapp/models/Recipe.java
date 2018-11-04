@@ -112,7 +112,7 @@ public class Recipe implements Parcelable {
         dest.writeInt(Servings);
     }
 
-    public static final Creator<Recipe> creator = new Creator<Recipe>() {
+    public static final Creator<Recipe> CREATOR  = new Creator<Recipe>() {
         @Override
         public Recipe createFromParcel(Parcel source) {
             return new Recipe(source);

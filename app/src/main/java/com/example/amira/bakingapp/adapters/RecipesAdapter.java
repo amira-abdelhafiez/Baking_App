@@ -51,7 +51,8 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
     @Override
     public void onBindViewHolder(@NonNull RecipeViewHolder holder, int position) {
 
-        String Name = (mRecipes[position].getName() == null) ? "No Name" : mRecipes[position].getName();
+        if(mRecipes[position] == null) return;
+        String Name = ((mRecipes[position].getName() == null) ? "No Name" : mRecipes[position].getName());
         holder.mRecipeNameTextView.setText(Name);
 
         int Servings = (mRecipes[position].getServings() <= 0) ? 0 : mRecipes[position].getServings();

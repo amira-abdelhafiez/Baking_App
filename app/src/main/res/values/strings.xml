@@ -6,4 +6,8 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="recipe_test_name">Name</string>
     <string name="testing_recipe">8</string>
+    <string name="ingredients_title">Ingredients</string>
+    <string name="steps_title">Steps</string>
+    <string name="previous_btn_text">Previous</string>
+    <string name="next_btn_text">Next</string>
 </resources>

@@ -22,7 +22,7 @@ public class Step {
     private String Video;
     @ColumnInfo(name = "thumbnail")
     private String Thumbnail;
-    @ForeignKey(entity = Recipe.class , parentColumns = "_id" , childColumns = "recipeId")
+    //@ForeignKey(entity = Recipe.class , parentColumns = "_id" , childColumns = "recipeId")
     @ColumnInfo(name = "recipeId")
     private int RecipeId;
 

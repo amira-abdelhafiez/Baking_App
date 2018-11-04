@@ -10,6 +10,7 @@ import java.util.List;
 @Dao
 public interface StepDao {
     @Query("SELECT * FROM step WHERE recipeId = :RecipeId")
+    // @Query("SELECT * FROM step")
     Cursor getSteps(int RecipeId);
 
     @Query("SELECT * FROM step WHERE _id = :Id")
@@ -17,4 +18,7 @@ public interface StepDao {
 
     @Insert
     long insert(Step step);
+
+    @Query("SELECT COUNT(*) FROM step")
+    int count();
 }

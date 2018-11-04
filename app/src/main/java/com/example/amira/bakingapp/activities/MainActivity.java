@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             convertCursorToArray(data);
             Log.d(LOG_TAG , "Data Arrived Bu Cursor Now Parsing and the count is " + data.getCount());
         }
+        data.close();
     }
 
     @Override
@@ -262,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 stepValues.put(DataContract.StepEntry.DESCRIPTION_COL , step.getDescription());
                 stepValues.put(DataContract.StepEntry.VIDEO_COL , step.getVideo());
                 stepValues.put(DataContract.StepEntry.THUMBNAIL_COL , step.getThumbnail());
-                stepValues.put(DataContract.StepEntry.RECIPE_ID_COL , step.getRecipeId());
+                stepValues.put(DataContract.StepEntry.RECIPE_ID_COL , recipe.getId());
                 contentResolver.insert(DataContract.StepEntry.CONTENT_URI , stepValues);
             }
 
@@ -272,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 ingredientsValues.put(DataContract.IngredientEntry.MEASURE_COL , ingredient.getMeasure());
                 ingredientsValues.put(DataContract.IngredientEntry.QUANTITY_COL , ingredient.getQuantity());
                 ingredientsValues.put(DataContract.IngredientEntry.NAME_COL , ingredient.getName());
-                ingredientsValues.put(DataContract.IngredientEntry.RECIPE_ID , ingredient.getRecipeId());
+                ingredientsValues.put(DataContract.IngredientEntry.RECIPE_ID , recipe.getId());
                 contentResolver.insert(DataContract.IngredientEntry.CONTENT_URI , ingredientsValues);
             }
         }
@@ -285,5 +286,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // put the extra here
         intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position]);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
     }
 }

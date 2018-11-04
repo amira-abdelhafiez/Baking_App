@@ -20,5 +20,5 @@ public interface RecipeDao {
     Cursor getRecipeById(int Id);
 
     @Query("SELECT COUNT(*) FROM recipe")
-    int getCount();
+    int count();
 }

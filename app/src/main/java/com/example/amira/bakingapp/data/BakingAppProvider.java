@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.IngredientDao;
@@ -19,6 +20,9 @@ import com.example.amira.bakingapp.models.Step;
 import com.example.amira.bakingapp.models.StepDao;
 
 public class BakingAppProvider extends ContentProvider {
+
+    private static final String LOG_TAG = BakingAppProvider.class.getSimpleName();
+
     private static final int RECIPE = 100;
     private static final int RECIPE_WITH_ID = 101;
     private static final int INGREDIENT = 200;
@@ -67,18 +71,21 @@ public class BakingAppProvider extends ContentProvider {
                 break;
             case INGREDIENT:
                 id = Integer.parseInt(selectionArgs[0]);
+                Log.d(LOG_TAG , "The IngredientId is " + id);
                 dataCursor = mDb.ingredientDao().getIngredients(id);
                 break;
             case INGREDIENT_WITH_ID:
-                id = uri.getPathSegments().indexOf(0);
+                id = Integer.parseInt(uri.getPathSegments().get(1));
                 dataCursor = mDb.ingredientDao().getIngredientById(id);
                 break;
             case STEP:
                 id = Integer.parseInt(selectionArgs[0]);
+                Log.d(LOG_TAG , "The RecipeId is " + id);
                 dataCursor = mDb.stepDao().getSteps(id);
                 break;
             case STEP_WITH_ID:
-                id = uri.getPathSegments().indexOf(0);
+                id = Integer.parseInt(uri.getPathSegments().get(1));
+                Log.d(LOG_TAG , "The stepId is " + id);
                 dataCursor = mDb.stepDao().getStepById(id);
                 break;
             default:
@@ -124,7 +131,7 @@ public class BakingAppProvider extends ContentProvider {
                 ingredient.setRecipeId(values.getAsInteger(DataContract.IngredientEntry.RECIPE_ID));
 
                 long insertedIngredientId = mDb.ingredientDao().insert(ingredient);
-
+                mDb.ingredientDao();
                 returnedUri = ContentUris.withAppendedId(DataContract.IngredientEntry.CONTENT_URI , insertedIngredientId);
                 break;
             case STEP:
@@ -155,4 +162,5 @@ public class BakingAppProvider extends ContentProvider {
     public int update(@NonNull Uri uri, @Nullable ContentValues values, @Nullable String selection, @Nullable String[] selectionArgs) {
         return 0;
     }
+
 }

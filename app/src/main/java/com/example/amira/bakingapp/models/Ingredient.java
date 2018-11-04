@@ -19,7 +19,7 @@ public class Ingredient {
     @ColumnInfo(name = "measure")
     private String Measure;
 
-    @ForeignKey(entity = Recipe.class , parentColumns = "_id" , childColumns = "recipeId")
+    //@ForeignKey(entity = Recipe.class , parentColumns = "_id" , childColumns = "recipeId")
     @ColumnInfo(name = "recipeId")
     private int RecipeId;
 

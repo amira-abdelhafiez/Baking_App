@@ -11,11 +11,16 @@ import java.util.List;
 public interface IngredientDao {
 
     @Query("SELECT * FROM ingredient WHERE recipeId = :RecipeId")
+   // @Query("SELECT * FROM ingredient")
     Cursor getIngredients(int RecipeId);
+
 
     @Query("SELECT * FROM ingredient WHERE _id = :Id")
     Cursor getIngredientById(int Id);
 
     @Insert
     long insert(Ingredient ingredient);
+
+    @Query("SELECT COUNT(*) FROM ingredient")
+    int count();
 }

@@ -4,12 +4,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.amira.bakingapp.R;
+import com.example.amira.bakingapp.data.DataContract;
 import com.example.amira.bakingapp.models.Step;
 
 public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHolder>{
@@ -20,6 +22,8 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     private Context mContext;
 
+    private int Id_Col , Number_Col , SDescription_Col , Description_Col , Recipe_Id_Col , Video_Col,
+                Thumbnail_Col;
     private int numberOfItems;
     private Cursor mStepCursor;
 
@@ -31,9 +35,11 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
         this.mStepCursor = cursor;
         if(cursor != null){
             this.numberOfItems = cursor.getCount();
+            Log.d(LOG_TAG , "The count is " + this.numberOfItems);
         }else{
             this.numberOfItems = 0;
         }
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -48,7 +54,16 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
 
     @Override
     public void onBindViewHolder(@NonNull StepViewHolder holder, int position) {
-        holder.mStepNumber =
+        if(mStepCursor.moveToPosition(position)) {
+
+            if (mStepCursor != null) {
+                Log.d(LOG_TAG, "Not Null Cursor");
+            }
+            Number_Col = mStepCursor.getColumnIndex(DataContract.StepEntry.NUMBER_COL);
+            SDescription_Col = mStepCursor.getColumnIndex(DataContract.StepEntry.S_DESCRIPTION_COL);
+            holder.mStepNumber.setText(Integer.toString(mStepCursor.getInt(Number_Col)+1));
+            holder.mStepDescription.setText(mStepCursor.getString(SDescription_Col));
+        }
     }
 
     @Override
