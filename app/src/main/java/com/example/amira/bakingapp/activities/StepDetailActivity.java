@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 
 import com.example.amira.bakingapp.R;
 import com.example.amira.bakingapp.data.DataContract;
+import com.example.amira.bakingapp.fragments.FlowFragment;
+import com.example.amira.bakingapp.fragments.MasterFragment;
 import com.example.amira.bakingapp.models.Step;
 import com.example.amira.bakingapp.utils.NetworkUtils;
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -46,9 +49,15 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     private Cursor mRecipeSteps;
 
     private static final int RECIPE_STEPS_LOADER_ID = 801;
+    private static final int RECIPE_INGREDIENTS_LOADER_ID = 803;
 
     private static final String CURRENT_ID = "currentPosition";
     private static final String CURRENT_RECIPE_ID = "currentRecipeId";
+
+    private boolean TwoPaneUI;
+
+    private MasterFragment mMasterFragment;
+    private FlowFragment mFlowFragment;
 
     private SimpleExoPlayer mPlayer;
 
@@ -81,24 +90,48 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
             mCurrentRecipeId = callingIntent.getIntExtra(CURRENT_RECIPE_ID , -1);
             Log.d(LOG_TAG , "Current Recipe Id is " + mCurrentRecipeId);
         }
-        ButterKnife.bind(this);
+
+        if(findViewById(R.id.master_fragment_container) != null){
+            TwoPaneUI = true;
+
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            mMasterFragment = new MasterFragment();
+            mMasterFragment.setmContext(this);
+            fragmentManager.beginTransaction()
+                    .add(R.id.master_fragment_container , mMasterFragment)
+                    .commit();
+
+            mFlowFragment = new FlowFragment();
+            mFlowFragment.setmContext(this);
+            fragmentManager.beginTransaction()
+                    .add(R.id.flow_fragment_container , mFlowFragment)
+                    .commit();
+        }else{
+            TwoPaneUI = false;
+            ButterKnife.bind(this);
+        }
+
         getRecipeSteps();
-
         getSupportLoaderManager().initLoader(RECIPE_STEPS_LOADER_ID , null , this);
+        if(TwoPaneUI){
+            getSupportLoaderManager().initLoader(RECIPE_INGREDIENTS_LOADER_ID , null , this);
 
-        mPreviousButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                returnToPrevious();
-            }
-        });
+        }else{
+            mPreviousButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    returnToPrevious();
+                }
+            });
 
-        mNextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToNext();
-            }
-        });
+            mNextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goToNext();
+                }
+            });
+        }
+
 
     }
 
@@ -204,6 +237,7 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void releasePlayer(){
+        if(mPlayer == null) return;
         mPlayer.stop();
         mPlayer.release();
         mPlayer = null;
@@ -290,6 +324,41 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
                     stepsCursor = data;
                 }
             };
+        }else if(id == RECIPE_INGREDIENTS_LOADER_ID){
+
+            return new android.support.v4.content.AsyncTaskLoader<Cursor>(this) {
+                Cursor mIngredientCursor;
+                @Override
+                protected void onStartLoading() {
+                    super.onStartLoading();
+                    if(mIngredientCursor != null){
+                        deliverResult(mIngredientCursor);
+                    }else{
+                        forceLoad();
+                    }
+                }
+
+                @Nullable
+                @Override
+                public Cursor loadInBackground() {
+                    mIngredientCursor = null;
+                    try{
+                        String[] selectionArgs = new String[]{Integer.toString(mCurrentRecipeId)};
+                        mIngredientCursor = getContentResolver().query(DataContract.IngredientEntry.CONTENT_URI,
+                                null , null , selectionArgs , null);
+
+                    }catch (Exception e){
+                        Log.d(LOG_TAG , e.getMessage());
+                    }
+                    return mIngredientCursor;
+                }
+
+                @Override
+                public void deliverResult(@Nullable Cursor data) {
+                    super.deliverResult(data);
+                    mIngredientCursor = data;
+                }
+            };
         }else{
             return null;
         }
@@ -311,12 +380,38 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
             if(data != null){
                 Log.d(LOG_TAG , "Got recipe steps Data");
                 mRecipeSteps = data;
-                initializeExoPlayer();
-                populateData();
+
+                if(TwoPaneUI){
+                    mMasterFragment.setmStepsCursor(data);
+                    data.moveToFirst();
+                    Step step = new Step();
+                    step.setId(data.getInt(data.getColumnIndex(DataContract.StepEntry.ID_COL)));
+                    step.setNumber(data.getInt(data.getColumnIndex(DataContract.StepEntry.NUMBER_COL)));
+                    step.setDescription(data.getString(data.getColumnIndex(DataContract.StepEntry.DESCRIPTION_COL)));
+                    step.setVideo(data.getString(data.getColumnIndex(DataContract.StepEntry.VIDEO_COL)));
+                    step.setShortDescription(data.getString(data.getColumnIndex(DataContract.StepEntry.S_DESCRIPTION_COL)));
+                    step.setRecipeId(data.getInt(data.getColumnIndex(DataContract.StepEntry.RECIPE_ID_COL)));
+                    mFlowFragment.setmCurrentStep(step);
+
+                    mMasterFragment.setUserVisibleHint(true);
+                    mMasterFragment.setUserVisibleHint(true);
+                }else{
+                    initializeExoPlayer();
+                    populateData();
+                }
             }else{
                 Log.d(LOG_TAG , "The whole Steps Cursor data is null");
             }
 
+        }else if(loader.getId() == RECIPE_INGREDIENTS_LOADER_ID){
+            if(data != null){
+                if(TwoPaneUI){
+                    mMasterFragment.setmIngredientCursor(data);
+                    mMasterFragment.setUserVisibleHint(true);
+                }
+            }else{
+                Log.d(LOG_TAG , "Null Ingredients Data");
+            }
         }else{
             Log.d(LOG_TAG , "Invalid Loader Id");
         }

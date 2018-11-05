@@ -12,10 +12,14 @@
         android:layout_height="@dimen/step_number_tv_dimen"
         android:background="@drawable/circle"
         android:layout_gravity="center_vertical"
+        android:gravity="center"
         android:layout_marginLeft="@dimen/step_number_tv_margin_left"/>
 
     <TextView
         android:id="@+id/tv_step_description"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/step_item_desc_margin"
+        android:layout_gravity="center"
+        android:gravity="center"/>
 </LinearLayout>

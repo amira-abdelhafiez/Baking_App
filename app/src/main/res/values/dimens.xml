@@ -5,7 +5,7 @@
     <dimen name="progress_bar_dimen">50dp</dimen>
     <dimen name="recipe_image_height">120dp</dimen>
     <dimen name="recipe_image_width">170dp</dimen>
-    <dimen name="iv_recipe_ingredient_icon_dimen">10dp</dimen>
+    <dimen name="iv_recipe_ingredient_icon_dimen">15dp</dimen>
     <dimen name="ingredient_margin">16dp</dimen>
     <dimen name="ingredient_margin_top">8dp</dimen>
     <dimen name="step_number_tv_dimen">35dp</dimen>
@@ -15,4 +15,6 @@
     <dimen name="step_video_height">200dp</dimen>
     <dimen name="recipe_detail_title_size">30sp</dimen>
     <dimen name="recipe_detail_title_padding">5dp</dimen>
+    <dimen name="title_image_dimen">40dp</dimen>
+    <dimen name="step_item_desc_margin">5dp</dimen>
 </resources>
