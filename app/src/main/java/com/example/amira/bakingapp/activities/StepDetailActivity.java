@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.amira.bakingapp.R;
+import com.example.amira.bakingapp.adapters.StepsAdapter;
 import com.example.amira.bakingapp.data.DataContract;
 import com.example.amira.bakingapp.fragments.FlowFragment;
 import com.example.amira.bakingapp.fragments.MasterFragment;
@@ -39,7 +41,7 @@ import java.net.URI;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StepDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class StepDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , StepsAdapter.onItemClickHandler{
 
     public static final String LOG_TAG = StepDetailActivity.class.getSimpleName();
 
@@ -53,6 +55,9 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
 
     private static final String CURRENT_ID = "currentPosition";
     private static final String CURRENT_RECIPE_ID = "currentRecipeId";
+
+    private static final String MASTER_FRAGMENT_TAG = "master_fragment";
+    private static final String FLOW_FRAGMENT_TAG = "flow_fragment";
 
     private boolean TwoPaneUI;
 
@@ -94,18 +99,37 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         if(findViewById(R.id.master_fragment_container) != null){
             TwoPaneUI = true;
 
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            mMasterFragment = new MasterFragment();
-            mMasterFragment.setmContext(this);
-            fragmentManager.beginTransaction()
-                    .add(R.id.master_fragment_container , mMasterFragment)
-                    .commit();
 
-            mFlowFragment = new FlowFragment();
-            mFlowFragment.setmContext(this);
-            fragmentManager.beginTransaction()
-                    .add(R.id.flow_fragment_container , mFlowFragment)
-                    .commit();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            Fragment savedFragment = fragmentManager.findFragmentByTag(MASTER_FRAGMENT_TAG);
+            if(savedFragment == null){
+                mMasterFragment = new MasterFragment();
+                mMasterFragment.setmContext(this , this);
+                fragmentManager.beginTransaction()
+                        .add(R.id.master_fragment_container, mMasterFragment , MASTER_FRAGMENT_TAG)
+                        .commit();
+            }else{
+                fragmentManager.beginTransaction()
+                        .replace(R.id.master_fragment_container , savedFragment , MASTER_FRAGMENT_TAG);
+                mMasterFragment = (MasterFragment) savedFragment;
+                mMasterFragment.setmContext(this , this);
+            }
+
+            Fragment savedFragment2 = fragmentManager.findFragmentByTag(FLOW_FRAGMENT_TAG);
+            if(savedFragment2 == null){
+                mFlowFragment = new FlowFragment();
+                mFlowFragment.setmContext(this);
+                fragmentManager.beginTransaction()
+                        .add(R.id.flow_fragment_container, mFlowFragment , FLOW_FRAGMENT_TAG)
+                        .commit();
+            }else{
+                fragmentManager.beginTransaction()
+                        .replace(R.id.flow_fragment_container , savedFragment2 , FLOW_FRAGMENT_TAG);
+                mFlowFragment = (FlowFragment) savedFragment2;
+                mFlowFragment.setmContext(this);
+            }
+
         }else{
             TwoPaneUI = false;
             ButterKnife.bind(this);
@@ -131,8 +155,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
                 }
             });
         }
-
-
     }
 
 
@@ -383,6 +405,8 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
 
                 if(TwoPaneUI){
                     mMasterFragment.setmStepsCursor(data);
+                    mMasterFragment.setUserVisibleHint(true);
+
                     data.moveToFirst();
                     Step step = new Step();
                     step.setId(data.getInt(data.getColumnIndex(DataContract.StepEntry.ID_COL)));
@@ -392,9 +416,8 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
                     step.setShortDescription(data.getString(data.getColumnIndex(DataContract.StepEntry.S_DESCRIPTION_COL)));
                     step.setRecipeId(data.getInt(data.getColumnIndex(DataContract.StepEntry.RECIPE_ID_COL)));
                     mFlowFragment.setmCurrentStep(step);
+                    mFlowFragment.setUserVisibleHint(true);
 
-                    mMasterFragment.setUserVisibleHint(true);
-                    mMasterFragment.setUserVisibleHint(true);
                 }else{
                     initializeExoPlayer();
                     populateData();
@@ -420,5 +443,20 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
+    }
+
+    @Override
+    public void onClick(int position) {
+
+        mRecipeSteps.moveToPosition(position);
+        Step step = new Step();
+        step.setId(mRecipeSteps.getInt(mRecipeSteps.getColumnIndex(DataContract.StepEntry.ID_COL)));
+        step.setNumber(mRecipeSteps.getInt(mRecipeSteps.getColumnIndex(DataContract.StepEntry.NUMBER_COL)));
+        step.setDescription(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.DESCRIPTION_COL)));
+        step.setVideo(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.VIDEO_COL)));
+        step.setShortDescription(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.S_DESCRIPTION_COL)));
+        step.setRecipeId(mRecipeSteps.getInt(mRecipeSteps.getColumnIndex(DataContract.StepEntry.RECIPE_ID_COL)));
+        mFlowFragment.setmCurrentStep(step);
+        mFlowFragment.setUserVisibleHint(true);
     }
 }

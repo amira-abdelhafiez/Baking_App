@@ -27,6 +27,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     private int numberOfItems;
     private Cursor mStepCursor;
 
+    public StepsAdapter(){}
     public StepsAdapter(onItemClickHandler handler){
         this.handler = handler;
     }
@@ -74,7 +75,6 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepViewHold
     public interface onItemClickHandler{
         void onClick(int position);
     }
-
     public class StepViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         TextView mStepNumber , mStepDescription;

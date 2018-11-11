@@ -14,10 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.amira.bakingapp.R;
+import com.example.amira.bakingapp.activities.StepDetailActivity;
 import com.example.amira.bakingapp.adapters.IngredientsAdapter;
 import com.example.amira.bakingapp.adapters.StepsAdapter;
 
-public class MasterFragment extends Fragment implements StepsAdapter.onItemClickHandler{
+public class MasterFragment extends Fragment{
 
     private static final String LOG_TAG = MasterFragment.class.getSimpleName();
 
@@ -27,6 +28,7 @@ public class MasterFragment extends Fragment implements StepsAdapter.onItemClick
 
     private RecyclerView mStepsRecyclerView , mIngredientsRecyclerView;
     private Context mContext;
+    private StepsAdapter.onItemClickHandler handler;
     public MasterFragment(){
 
     }
@@ -46,7 +48,7 @@ public class MasterFragment extends Fragment implements StepsAdapter.onItemClick
         RecyclerView.LayoutManager ingredientLayoutManager = new LinearLayoutManager(mContext , LinearLayoutManager.VERTICAL , false);
         mIngredientsRecyclerView.setLayoutManager(ingredientLayoutManager);
 
-        mStepsAdapter = new StepsAdapter(this);
+        mStepsAdapter = new StepsAdapter(handler);
         mStepsAdapter.setmSteps(mStepCursor);
         RecyclerView.LayoutManager stepsLayoutManager = new LinearLayoutManager(mContext , LinearLayoutManager.VERTICAL , false);
         mStepsRecyclerView.setAdapter(mStepsAdapter);
@@ -54,8 +56,9 @@ public class MasterFragment extends Fragment implements StepsAdapter.onItemClick
 
         return rootView;
     }
-    public void setmContext(Context context){
+    public void setmContext(Context context , StepsAdapter.onItemClickHandler handler){
         mContext  = context;
+        this.handler = handler;
     }
 
     public void setmStepsCursor(Cursor data){
@@ -64,11 +67,6 @@ public class MasterFragment extends Fragment implements StepsAdapter.onItemClick
 
     public void setmIngredientCursor(Cursor data){
         this.mIngredientCursor = data;
-    }
-
-    @Override
-    public void onClick(int position) {
-        Toast toast = Toast.makeText(mContext , "You clicked on item number " + position , Toast.LENGTH_SHORT);
     }
 
     @Override

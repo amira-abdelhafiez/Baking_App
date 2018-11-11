@@ -10,4 +10,7 @@
     <string name="steps_title">Steps</string>
     <string name="previous_btn_text">Previous</string>
     <string name="next_btn_text">Next</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="configure">Configure</string>
 </resources>

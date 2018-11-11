@@ -88,11 +88,11 @@ public class FlowFragment extends Fragment {
         mStepDescription.setText(mCurrentStep.getDescription());
         String videoValue = mCurrentStep.getVideo();
         if(videoValue == null || videoValue.isEmpty()){
-            mExoPlayerView.setVisibility(View.INVISIBLE);
+            mExoPlayerView.setVisibility(View.GONE);
             mNoVideoImageView.setVisibility(View.VISIBLE);
         }else{
             mExoPlayerView.setVisibility(View.VISIBLE);
-            mNoVideoImageView.setVisibility(View.INVISIBLE);
+            mNoVideoImageView.setVisibility(View.GONE);
         }
     }
 

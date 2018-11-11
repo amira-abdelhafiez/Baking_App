@@ -35,6 +35,12 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
 
     private ItemOnClickHandler handler;
 
+    private static final int[] IMAGES_IDS = {
+            R.drawable.image_1 ,
+            R.drawable.image_2 ,
+            R.drawable.image_3 ,
+            R.drawable.image_4
+    };
     public RecipesAdapter(ItemOnClickHandler handler){
         this.handler = handler;
     }
@@ -61,10 +67,11 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         holder.mRecipeServingsTextView.setText(Integer.toString(Servings));
 
         String imageUrl = mRecipes[position].getImage();
-
+        int imageIndex = mRecipes[position].getId()-1;
         if (imageUrl == null || imageUrl.equals("") || imageUrl.equals(" ")) {
             Picasso.with(mContext)
-                    .load(R.drawable.default_meal_image)
+                    .load(IMAGES_IDS[imageIndex])
+                    .error(R.drawable.default_meal_image)
                     .into(holder.mRecipeImageView);
         } else {
             Picasso.with(mContext)
