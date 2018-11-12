@@ -24,6 +24,7 @@ import com.example.amira.bakingapp.data.DataContract;
 import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.Recipe;
 import com.example.amira.bakingapp.models.Step;
+import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,7 +39,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
     private static final String CURRENT_ID = "currentPosition";
     private static final String CURRENT_RECIPE_ID = "currentRecipeId";
 
-    private Recipe mCurrentRecipe;
+    private int mCurrentRecipeId;
     private Cursor mIngredientCursor , mStepsCursor;
 
     private StepsAdapter mStepsAdapter;
@@ -51,6 +52,8 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
     @BindView(R.id.rv_recipe_steps)
     RecyclerView mStepsRecyclerView;
 
+    @BindView(R.id.recipe_image)
+    ImageView mRecipeImage;
 
     AppDatabase db;
     @Override
@@ -58,10 +61,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
 
-        mCurrentRecipe = null;
+        mCurrentRecipeId = 0;
         Intent callingIntent = getIntent();
         if(callingIntent.hasExtra(Intent.EXTRA_TEXT)){
-            mCurrentRecipe = callingIntent.getParcelableExtra(Intent.EXTRA_TEXT);
+            mCurrentRecipeId = callingIntent.getIntExtra(Intent.EXTRA_TEXT , -1);
         }
 
         ButterKnife.bind(this);
@@ -70,6 +73,16 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
 
         Log.d(LOG_TAG , "The steps is  " + db.stepDao().count());
         Log.d(LOG_TAG , "The in is " + db.ingredientDao().count());
+
+        int imageIndex = mCurrentRecipeId - 1;
+        if(imageIndex >= 0){
+            Picasso.with(this)
+                    .load(Recipe.getRecipeImages()[imageIndex])
+                    .placeholder(R.drawable.default_meal_image)
+                    .into(mRecipeImage);
+        }
+
+
         mStepsAdapter = new StepsAdapter(this);
         mIngredientsAdapter = new IngredientsAdapter();
 
@@ -134,10 +147,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 @Nullable
                 @Override
                 public Cursor loadInBackground() {
-                    if(mCurrentRecipe == null) return null;
+                    if(mCurrentRecipeId == -1) return null;
                     Log.d(LOG_TAG , "LoadInBack for ingredients");
                     String selection = "recipeId =: %d";
-                    String id = Integer.toString(mCurrentRecipe.getId());
+                    String id = Integer.toString(mCurrentRecipeId);
                     String[] selectionArgs = new String[] {id};
                     mIngredientsData = getContentResolver().query(DataContract.IngredientEntry.CONTENT_URI ,
                             null, null ,selectionArgs, null);
@@ -169,10 +182,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 @Nullable
                 @Override
                 public Cursor loadInBackground() {
-                    if(mCurrentRecipe == null) return null;
+                    if(mCurrentRecipeId == -1) return null;
                     Log.d(LOG_TAG , "Load in back steps");
                     String selection = "recipeId =: %d";
-                    String id = Integer.toString(mCurrentRecipe.getId());
+                    String id = Integer.toString(mCurrentRecipeId);
                     String[] selectionArgs = new String[] {id};
                     mStepData = getContentResolver().query(DataContract.StepEntry.CONTENT_URI ,
                             null , null , selectionArgs , DataContract.StepEntry.NUMBER_COL);

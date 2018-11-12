@@ -284,7 +284,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Intent intent = new Intent(MainActivity.this , RecipeDetailActivity.class);
         //int id = mRecipes[position].getId();
         // put the extra here
-        intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position]);
+        intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position].getId());
         startActivity(intent);
     }
 

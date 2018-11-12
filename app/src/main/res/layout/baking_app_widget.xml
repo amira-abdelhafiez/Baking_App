@@ -1,15 +1,18 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<FrameLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
-    android:padding="@dimen/widget_margin">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <StackView
+        android:id="@+id/widget_recipe_stack_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:loopViews="true"/>
 
-
-    <ImageView
-        android:id="@+id/widget_image"
-        android:src="@drawable/steps_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-
-</RelativeLayout>
+    <TextView
+        android:text="@string/widget_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/darker_gray"
+        android:textColor="#FFFFFF"
+        android:textAlignment="center"
+        android:visibility="invisible"/>
+</FrameLayout>

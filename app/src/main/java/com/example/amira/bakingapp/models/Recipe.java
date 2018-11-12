@@ -7,6 +7,8 @@ import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.amira.bakingapp.R;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
@@ -25,6 +27,14 @@ public class Recipe implements Parcelable {
     private ArrayList<Ingredient> Ingredients;
     @Ignore
     private ArrayList<Step> Steps;
+
+    @Ignore
+    private static final int[] IMAGES_IDS = {
+            R.drawable.image_1 ,
+            R.drawable.image_2 ,
+            R.drawable.image_3 ,
+            R.drawable.image_4
+    };
 
     @Ignore
     public Recipe(){
@@ -99,6 +109,10 @@ public class Recipe implements Parcelable {
         Steps = steps;
     }
 
+    @Ignore
+    public static int[] getRecipeImages(){
+        return IMAGES_IDS;
+    }
     @Override
     public int describeContents() {
         return 0;
