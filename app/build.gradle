@@ -42,10 +42,19 @@ dependencies {
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
-    // Widgets
-
     // Testing Espresso
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-intents:3.0.2'
+    implementation 'com.android.support.test.espresso:espresso-idling-resource:3.0.2'
+    androidTestImplementation('com.android.support.test.espresso:espresso-contrib:2.2.2') {
+        exclude module: 'support-annotations'
+        exclude module: 'support-v4'
+        exclude module: 'design'
+        exclude module: 'recyclerview-v7'
+        exclude module: 'accessibility-test-framework'
+    }
+
 }

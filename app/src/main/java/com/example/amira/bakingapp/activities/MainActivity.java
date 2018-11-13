@@ -287,7 +287,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position].getId());
         startActivity(intent);
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

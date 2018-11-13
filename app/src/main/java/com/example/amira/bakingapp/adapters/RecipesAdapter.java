@@ -64,10 +64,17 @@ public class RecipesAdapter extends RecyclerView.Adapter<RecipesAdapter.RecipeVi
         String imageUrl = mRecipes[position].getImage();
         int imageIndex = mRecipes[position].getId()-1;
         if (imageUrl == null || imageUrl.equals("") || imageUrl.equals(" ")) {
-            Picasso.with(mContext)
-                    .load(Recipe.getRecipeImages()[imageIndex])
-                    .error(R.drawable.default_meal_image)
-                    .into(holder.mRecipeImageView);
+            if(imageIndex >= 0 && imageIndex < 4) {
+                Picasso.with(mContext)
+                        .load(Recipe.getRecipeImages()[imageIndex])
+                        .error(R.drawable.default_meal_image)
+                        .into(holder.mRecipeImageView);
+            }else{
+                Picasso.with(mContext)
+                        .load(R.drawable.default_meal_image)
+                        .error(R.drawable.default_meal_image)
+                        .into(holder.mRecipeImageView);
+            }
         } else {
             Picasso.with(mContext)
                     .load(imageUrl)

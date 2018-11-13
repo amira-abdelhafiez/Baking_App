@@ -75,7 +75,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
         Log.d(LOG_TAG , "The in is " + db.ingredientDao().count());
 
         int imageIndex = mCurrentRecipeId - 1;
-        if(imageIndex >= 0){
+        if(imageIndex >= 0 && imageIndex < 4){
             Picasso.with(this)
                     .load(Recipe.getRecipeImages()[imageIndex])
                     .placeholder(R.drawable.default_meal_image)
