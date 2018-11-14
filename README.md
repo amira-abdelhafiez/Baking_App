@@ -1,13 +1,25 @@
 # Baking App
 
-# Libraries
-1- Butterknife.
-2- Espresso.
-3- Picasso.
-4- RecyclerView.
-5- Room.
-6- Consraint Layout.
-7- Exo Player.
+This is the Application that I made for my third project in the Android Nanodegree. <br />
+The user can see a lot of recipes and ingredients and steps for each recipe , also can see videos for each step. <br />
+The app support different screen devices. <br />
+
+# Features
+
+1- View Rceipes.
+2- See steps , ingredients for each one.
+3- View video for each step.
+4- There is also a widget for the app.
+
+# Libraries used
+
+1- Butterknife. <br />
+2- Espresso. <br />
+3- Picasso. <br />
+4- RecyclerView. <br />
+5- Room. <br />
+6- Consraint Layout. <br />
+7- Exo Player. <br />
 
 # Pics
 ![baking1](https://user-images.githubusercontent.com/20417885/48444895-eb65d000-e79d-11e8-928b-aa389560109c.png)
