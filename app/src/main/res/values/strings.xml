@@ -2,8 +2,6 @@
     <string name="app_name">Baking App</string>
 
     <string name="title_activity_splash_screen">SplashScreen</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="recipe_test_name">Name</string>
     <string name="testing_recipe">8</string>
     <string name="ingredients_title">Ingredients</string>

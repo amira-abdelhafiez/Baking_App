@@ -21,6 +21,7 @@ import com.example.amira.bakingapp.adapters.IngredientsAdapter;
 import com.example.amira.bakingapp.adapters.StepsAdapter;
 import com.example.amira.bakingapp.data.AppDatabase;
 import com.example.amira.bakingapp.data.DataContract;
+import com.example.amira.bakingapp.data.StepIdlingResource;
 import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.Recipe;
 import com.example.amira.bakingapp.models.Step;
@@ -56,6 +57,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
     ImageView mRecipeImage;
 
     AppDatabase db;
+
+    @Nullable private StepIdlingResource resource;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -137,6 +141,7 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 @Override
                 protected void onStartLoading() {
                     super.onStartLoading();
+
                     if(mIngredientsData != null){
                         deliverResult(mIngredientsData);
                     }else{
@@ -171,6 +176,10 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 @Override
                 protected void onStartLoading() {
                     super.onStartLoading();
+
+                    if(resource != null){
+                        resource.setIdleState(false);
+                    }
 
                     if(mStepData != null){
                         deliverResult(mStepData);
@@ -228,6 +237,9 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 mStepsAdapter.setmSteps(data);
             }else{
                 Log.d(LOG_TAG , "Steps Null");
+            }
+            if(resource != null){
+                resource.setIdleState(true);
             }
         }else{
             Log.d(LOG_TAG  , "Invalid Loader ID in onLoadFinished");
