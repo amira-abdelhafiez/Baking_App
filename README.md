@@ -6,10 +6,10 @@ The app support different screen devices. <br />
 
 # Features
 
-1- View Rceipes.
-2- See steps , ingredients for each one.
-3- View video for each step.
-4- There is also a widget for the app.
+1- View Rceipes. <br />
+2- See steps , ingredients for each one. <br />
+3- View video for each step. <br />
+4- There is also a widget for the app. <br />
 
 # Libraries used
 
