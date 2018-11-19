@@ -17,6 +17,7 @@
     <dimen name="recipe_detail_title_padding">5dp</dimen>
     <dimen name="title_image_dimen">40dp</dimen>
     <dimen name="step_item_desc_margin">5dp</dimen>
+    <dimen name="recipe_item_text_padding">8dp</dimen>
 
     <!--
 Refer to App Widget Documentation for margin information
@@ -26,4 +27,8 @@ http://developer.android.com/guide/topics/appwidgets/index.html#CreatingLayout
     <dimen name="widget_text_size">30sp</dimen>
     <dimen name="widget_text_padding">5dp</dimen>
     <dimen name="image_height">150dp</dimen>
+    <dimen name="recipe_servings_icon_size">18dp</dimen>
+    <dimen name="step_description_long_margin">16dp</dimen>
+    <dimen name="step_description_long_margin_top">24dp</dimen>
+    <dimen name="tv_long_description_text_size">25sp</dimen>
 </resources>

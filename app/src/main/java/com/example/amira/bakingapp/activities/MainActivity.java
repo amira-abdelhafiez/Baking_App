@@ -2,6 +2,7 @@ package com.example.amira.bakingapp.activities;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
@@ -12,8 +13,10 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -26,6 +29,7 @@ import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.Recipe;
 import com.example.amira.bakingapp.models.Step;
 import com.example.amira.bakingapp.utils.JsonUtils;
+import com.example.amira.bakingapp.utils.LayoutUtils;
 import com.example.amira.bakingapp.utils.NetworkUtils;
 
 import java.io.IOException;
@@ -60,9 +64,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         ButterKnife.bind(this);
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int value = displayMetrics.widthPixels;
+        int valueDp = (int) LayoutUtils.convertPxToDp(this, (float)value);
+
+        boolean IsLargeScreen = (valueDp > 600);
+        int span , scalingFactor;
+        if(IsLargeScreen){
+            scalingFactor = 200;
+        }else {
+            scalingFactor = 150;
+        }
+        span = calculateNoOfColumns(this , scalingFactor);
         mAdapter = new RecipesAdapter(this);
         mRecipesRecyclerView.setAdapter(mAdapter);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL , false );
+        RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, span);
         mRecipesRecyclerView.setLayoutManager(layoutManager);
 
 
@@ -79,6 +96,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }else{
             mLoaderManager.initLoader(RECIPES_LOADER_ID , null , this);
         }
+    }
+
+    public static int calculateNoOfColumns(Context context , int scalingFactor) {
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        int noOfColumns = (int) (dpWidth / scalingFactor);
+        if(noOfColumns < 2)
+            noOfColumns = 2;
+        return noOfColumns;
     }
 
     private void showErrorMessage(){

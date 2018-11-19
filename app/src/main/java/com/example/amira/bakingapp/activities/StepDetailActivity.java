@@ -1,6 +1,5 @@
 package com.example.amira.bakingapp.activities;
 
-import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -36,15 +35,14 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
-import java.net.URI;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class StepDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , StepsAdapter.onItemClickHandler{
 
-    public static final String LOG_TAG = StepDetailActivity.class.getSimpleName();
+    private static final String LOG_TAG = StepDetailActivity.class.getSimpleName();
 
+    private static final String CURRENT_PLAYER_POSITION = "current_player_position";
 
     private int mCurrentPosition , mCurrentRecipeId;
 
@@ -65,6 +63,8 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     private FlowFragment mFlowFragment;
 
     private SimpleExoPlayer mPlayer;
+
+    private long mCurrentPlayerPosition = 0;
 
     @BindView(R.id.tv_step_long_description)
     TextView mStepDescription;
@@ -87,13 +87,28 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_step_detail);
         Intent callingIntent = getIntent();
+
+
         if(callingIntent.hasExtra(CURRENT_ID)){
-            mCurrentPosition = callingIntent.getIntExtra(CURRENT_ID , -1);
+            mCurrentPosition = callingIntent.getIntExtra(CURRENT_ID , 0);
             Log.d(LOG_TAG , "the intent value Id " + Integer.toString(mCurrentPosition));
         }
         if(callingIntent.hasExtra(CURRENT_RECIPE_ID)){
             mCurrentRecipeId = callingIntent.getIntExtra(CURRENT_RECIPE_ID , -1);
             Log.d(LOG_TAG , "Current Recipe Id is " + mCurrentRecipeId);
+        }
+
+        if(savedInstanceState != null){
+
+            if(savedInstanceState.containsKey(CURRENT_PLAYER_POSITION)){
+                mCurrentPlayerPosition = savedInstanceState.getLong(CURRENT_PLAYER_POSITION, 0);
+            }
+            if(savedInstanceState.containsKey(CURRENT_ID)){
+                mCurrentPosition = savedInstanceState.getInt(CURRENT_ID);
+            }
+            if(savedInstanceState.containsKey(CURRENT_RECIPE_ID)){
+                mCurrentRecipeId = savedInstanceState.getInt(CURRENT_RECIPE_ID);
+            }
         }
 
         if(findViewById(R.id.master_fragment_container) != null){
@@ -202,18 +217,22 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         mPlayer = ExoPlayerFactory.newSimpleInstance(this ,
                 new DefaultTrackSelector() , new DefaultLoadControl());
 
-        mExoPlayerView.setPlayer(mPlayer);
         mPlayer.setPlayWhenReady(true);
+        mExoPlayerView.setPlayer(mPlayer);
+
 
         preparePlayerMediaSource();
     }
 
     private void preparePlayerMediaSource(){
         mPlayer.stop();
+        Log.d(LOG_TAG , "This is the current Position " + mCurrentPosition);
         mRecipeSteps.moveToPosition(mCurrentPosition);
+
         Uri videoUri = NetworkUtils.buildVideoUri(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.VIDEO_COL)));
         MediaSource mediaSource = buildMediaSource(videoUri);
         mPlayer.prepare(mediaSource);
+        mPlayer.seekTo(mCurrentPlayerPosition);
     }
 
     private MediaSource buildMediaSource(Uri uri){
@@ -236,17 +255,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         }
         changeButtons();
     }
-
-//
-//    private void getStepData(){
-//        LoaderManager lm = getSupportLoaderManager();
-//        Loader loader = lm.getLoader(STEP_LOADER_ID);
-//        if(loader == null){
-//            lm.initLoader(STEP_LOADER_ID , null , this);
-//        }else{
-//            lm.restartLoader(STEP_LOADER_ID , null , this);
-//        }
-//    }
 
     private void getRecipeSteps(){
         LoaderManager lm = getSupportLoaderManager();
@@ -274,45 +282,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     @NonNull
     @Override
     public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
-//        if(id == STEP_LOADER_ID){
-//            return new android.support.v4.content.AsyncTaskLoader<Cursor>(this) {
-//
-//                Cursor cursor;
-//                @Override
-//                protected void onStartLoading() {
-//                    super.onStartLoading();
-//                    if(cursor == null){
-//                        forceLoad();
-//                    }else {
-//                        deliverResult(cursor);
-//                    }
-//                }
-//
-//                @Nullable
-//                @Override
-//                public Cursor loadInBackground() {
-//                    cursor = null;
-//                    try{
-//                        Log.d(LOG_TAG , "Step Id From Loader " + mRecipeSteps);
-//                        Uri uri = DataContract.StepEntry.CONTENT_URI.buildUpon()
-//                                .appendPath(Integer.toString(mCurrentStepId))
-//                                .build();
-//                        Log.d(LOG_TAG , uri.toString());
-//                        cursor = getContentResolver().query(uri ,
-//                                null , null , null , null);
-//                    }catch(Exception e){
-//
-//                    }
-//                    return cursor;
-//                }
-//
-//                @Override
-//                public void deliverResult(@Nullable Cursor data) {
-//                    super.deliverResult(data);
-//                    cursor = data;
-//                }
-//            };
-//        }
         if(id == RECIPE_STEPS_LOADER_ID){
             return new android.support.v4.content.AsyncTaskLoader<Cursor>(this) {
                 Cursor stepsCursor;
@@ -388,16 +357,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-//        if(loader.getId() == STEP_LOADER_ID){
-//            if(data != null){
-//                m = data;
-//                Log.d(LOG_TAG , Integer.toString(mCurrentStep.getCount()));
-//                initializeExoPlayer();
-//                populateData();
-//            }else{
-//                Log.d(LOG_TAG , "Null Value");
-//            }
-//        }
         if(loader.getId() == RECIPE_STEPS_LOADER_ID){
             if(data != null){
                 Log.d(LOG_TAG , "Got recipe steps Data");
@@ -458,5 +417,27 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         step.setRecipeId(mRecipeSteps.getInt(mRecipeSteps.getColumnIndex(DataContract.StepEntry.RECIPE_ID_COL)));
         mFlowFragment.setmCurrentStep(step);
         mFlowFragment.setUserVisibleHint(true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putLong(CURRENT_PLAYER_POSITION, mCurrentPlayerPosition);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onPause() {
+        if(mPlayer != null){
+            mCurrentPlayerPosition = mPlayer.getCurrentPosition();
+        }
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mPlayer != null) {
+            initializeExoPlayer();
+        }
     }
 }

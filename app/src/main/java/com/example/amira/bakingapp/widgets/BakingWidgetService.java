@@ -97,28 +97,5 @@ public class BakingWidgetService extends RemoteViewsService {
             return true;
         }
 
-//        class RecipesQuery extends AsyncTask<Void , Void , Cursor>{
-//
-//            @Override
-//            protected void onPreExecute() {
-//                super.onPreExecute();
-//            }
-//
-//            @Override
-//            protected Cursor doInBackground(Void... voids) {
-//                Cursor cursor = getContentResolver().query(DataContract.RecipeEntry.CONTENT_URI ,
-//                        null , null , null , null);
-//                return cursor;
-//            }
-//
-//            @Override
-//            protected void onPostExecute(Cursor cursor) {
-//                super.onPostExecute(cursor);
-//                if(mCursor != null) mCursor.close();
-//                Log.d(LOG_TAG , "Data Arrived");
-//
-//                mCursor = cursor;
-//            }
-//        }
     }
 }

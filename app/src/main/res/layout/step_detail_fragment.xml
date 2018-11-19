@@ -36,15 +36,15 @@
         android:id="@+id/tv_step_long_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginEnd="@dimen/step_description_long_margin"
+        android:layout_marginLeft="@dimen/step_description_long_margin"
+        android:layout_marginRight="@dimen/step_description_long_margin"
+        android:layout_marginStart="@dimen/step_description_long_margin"
+        android:layout_marginTop="@dimen/step_description_long_margin_top"
+        android:textSize="@dimen/tv_long_description_text_size"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/image_video_container"
-
-        tools:text="Hello This is jkusjakfsjakldjgfksdjgk kjsfksaf" />
+        tools:text="@string/testing_recipe" />
 
 </android.support.constraint.ConstraintLayout>

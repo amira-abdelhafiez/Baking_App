@@ -131,4 +131,9 @@ public class FlowFragment extends Fragment {
                     .commit();
         }
     }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 }
