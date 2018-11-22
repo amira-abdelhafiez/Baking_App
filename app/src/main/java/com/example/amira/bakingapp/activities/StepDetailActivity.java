@@ -214,17 +214,17 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void initializeExoPlayer(){
-        mPlayer = ExoPlayerFactory.newSimpleInstance(this ,
-                new DefaultTrackSelector() , new DefaultLoadControl());
+        if(mPlayer == null) {
+            mPlayer = ExoPlayerFactory.newSimpleInstance(this,
+                    new DefaultTrackSelector(), new DefaultLoadControl());
 
-        mPlayer.setPlayWhenReady(true);
-        mExoPlayerView.setPlayer(mPlayer);
-
-
-        preparePlayerMediaSource();
+            mPlayer.setPlayWhenReady(true);
+            mExoPlayerView.setPlayer(mPlayer);
+        }
     }
 
     private void preparePlayerMediaSource(){
+        if(mPlayer == null) return;
         mPlayer.stop();
         Log.d(LOG_TAG , "This is the current Position " + mCurrentPosition);
         mRecipeSteps.moveToPosition(mCurrentPosition);
@@ -378,9 +378,9 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
                     mFlowFragment.setUserVisibleHint(true);
 
                 }else{
-                    initializeExoPlayer();
                     populateData();
                 }
+                preparePlayerMediaSource();
             }else{
                 Log.d(LOG_TAG , "The whole Steps Cursor data is null");
             }
@@ -430,14 +430,27 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         if(mPlayer != null){
             mCurrentPlayerPosition = mPlayer.getCurrentPosition();
         }
+        releasePlayer();
         super.onPause();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        initializeExoPlayer();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(mPlayer != null) {
-            initializeExoPlayer();
-        }
+        initializeExoPlayer();
+        getSupportLoaderManager().restartLoader(RECIPE_INGREDIENTS_LOADER_ID , null  , this);
+        getSupportLoaderManager().restartLoader(RECIPE_STEPS_LOADER_ID , null , this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        releasePlayer();
     }
 }

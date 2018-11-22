@@ -13,8 +13,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.amira.bakingapp.R;
 import com.example.amira.bakingapp.adapters.IngredientsAdapter;
@@ -257,5 +261,28 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
         intent.putExtra(CURRENT_ID , position);
         intent.putExtra(CURRENT_RECIPE_ID , mStepsCursor.getInt(mStepsCursor.getColumnIndex(DataContract.StepEntry.RECIPE_ID_COL)));
         startActivity(intent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.widget_menu , menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch(id){
+            case R.id.action_add_to_widget:
+                updateWidget();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void updateWidget(){
+        Toast.makeText(this , "Menu Item Clicked" , Toast.LENGTH_SHORT).show();
     }
 }

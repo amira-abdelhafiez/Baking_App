@@ -16,16 +16,14 @@
         <activity
             android:name=".activities.SplashScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.MainActivity">
-
-        </activity>
+        <activity android:name=".activities.MainActivity"></activity>
         <activity
             android:name=".activities.StepDetailActivity"
             android:launchMode="singleTop"
@@ -52,8 +50,19 @@
                 android:resource="@xml/baking_app_widget_info" />
         </receiver>
 
-        <service android:name=".widgets.BakingWidgetService"
-            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+        <service
+            android:name=".widgets.BakingWidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
+
+        <receiver android:name=".widgets.IngredientsWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/ingredients_widget_info" />
+        </receiver>
     </application>
 
 </manifest>
