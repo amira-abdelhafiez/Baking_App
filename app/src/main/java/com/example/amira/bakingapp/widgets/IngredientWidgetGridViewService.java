@@ -3,6 +3,7 @@ package com.example.amira.bakingapp.widgets;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -14,38 +15,61 @@ public class IngredientWidgetGridViewService extends RemoteViewsService {
     private static final String LOG_TAG = IngredientWidgetGridViewFactory.class.getSimpleName();
     private static final String RECIPE_ID = "recipeId";
 
+    private static int mCurrentRecipeId;
+
+    public static void setRecipeId(int recipeId){
+        mCurrentRecipeId = recipeId;
+    }
+
     @Override
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         int recipeId = intent.getIntExtra(RECIPE_ID , -1);
-        return new IngredientWidgetGridViewFactory(getApplicationContext() , recipeId);
+        Log.d("WidgetTrace" , "here" + Integer.toString(recipeId));
+        return new IngredientWidgetGridViewFactory(getApplicationContext());
     }
 
     class IngredientWidgetGridViewFactory implements RemoteViewsFactory {
 
         private final String LOG_TAG = IngredientWidgetGridViewFactory.class.getSimpleName();
         private Context mContext;
-        private int mCurrentRecipeId;
-
         private Cursor mCursor;
 
-        public IngredientWidgetGridViewFactory(Context context , int recipeId){
+        public IngredientWidgetGridViewFactory(Context context){
             this.mContext = context;
-            this.mCurrentRecipeId = recipeId;
         }
+
 
         @Override
         public void onCreate() {
 
-        }
-
-        @Override
-        public void onDataSetChanged() {
+            Log.d("WidgetTrace" , "Inside the grid service OnCreate" + Integer.toString(mCurrentRecipeId));
             if(mCurrentRecipeId < 0) return;
             if(mCursor != null) mCursor.close();
 
             String[] args = {Integer.toString(mCurrentRecipeId)};
             mCursor = getContentResolver().query(DataContract.IngredientEntry.CONTENT_URI ,
                     null , null , args , null);
+            if(mCursor == null){
+                Log.d("WidgetTrace" , "Couldn't get data");
+            }else{
+                Log.d("WidgetTrace" , "Data Found");
+            }
+        }
+
+        @Override
+        public void onDataSetChanged() {
+            Log.d("WidgetTrace" , "Inside the grid service OnDataChanged" + Integer.toString(mCurrentRecipeId));
+            if(mCurrentRecipeId < 0) return;
+            if(mCursor != null) mCursor.close();
+
+            String[] args = {Integer.toString(mCurrentRecipeId)};
+            mCursor = getContentResolver().query(DataContract.IngredientEntry.CONTENT_URI ,
+                    null , null , args , null);
+            if(mCursor == null){
+                Log.d("WidgetTrace" , "Couldn't get data");
+            }else{
+                Log.d("WidgetTrace" , "Data Found");
+            }
         }
 
         @Override

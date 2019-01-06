@@ -1,12 +1,37 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/white"
     android:padding="@dimen/widget_margin">
 
-    <GridView
-        android:id="@+id/gv_ingredients_widget"
+    <TextView
+        android:id="@+id/tv_recipe_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        tools:text="@string/testing_recipe"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:background="@color/colorPrimaryDark"
+        android:textSize="@dimen/widget_text_size"
+        android:textStyle="bold"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_recipe_name">
+        <TextView
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_list_widget_text"
+            android:textAlignment="center"
+            android:layout_gravity="center"/>
+        <GridView
+            android:id="@+id/gv_ingredients_widget"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+
 
 </RelativeLayout>

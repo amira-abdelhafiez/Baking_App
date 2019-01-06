@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
+    public static final String RECIPE_NAME_EXTRA = "recipeName";
+
     private static final int RECIPES_LOADER_ID = 107;
 
     private LoaderManager mLoaderManager;
@@ -307,11 +309,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
     @Override
     public void onClickItem(int position) {
-        Intent intent = new Intent(MainActivity.this , RecipeDetailActivity.class);
-        //int id = mRecipes[position].getId();
-        // put the extra here
-        intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position].getId());
-        startActivity(intent);
+
+        try{
+            Intent intent = new Intent(MainActivity.this , RecipeDetailActivity.class);
+            intent.putExtra(Intent.EXTRA_TEXT , mRecipes[position].getId());
+            intent.putExtra(RECIPE_NAME_EXTRA , mRecipes[position].getName());
+            startActivity(intent);
+        }catch(Exception e){
+
+        }
+
     }
     @Override
     protected void onDestroy() {

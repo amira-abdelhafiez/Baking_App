@@ -25,6 +25,7 @@ import com.example.amira.bakingapp.fragments.MasterFragment;
 import com.example.amira.bakingapp.models.Step;
 import com.example.amira.bakingapp.utils.NetworkUtils;
 import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -42,9 +43,7 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
 
     private static final String LOG_TAG = StepDetailActivity.class.getSimpleName();
 
-    private static final String CURRENT_PLAYER_POSITION = "current_player_position";
-
-    private int mCurrentPosition , mCurrentRecipeId;
+    private int mCurrentID , mCurrentRecipeId;
 
     private Cursor mRecipeSteps;
 
@@ -52,7 +51,11 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     private static final int RECIPE_INGREDIENTS_LOADER_ID = 803;
 
     private static final String CURRENT_ID = "currentPosition";
+    // State
     private static final String CURRENT_RECIPE_ID = "currentRecipeId";
+    private static final String CURRENT_PLAYER_POSITION = "current_player_position";
+    private static final String PLAY_IF_READY = "playwhenReady";
+    private static final String STEP_ID = "stepId";
 
     private static final String MASTER_FRAGMENT_TAG = "master_fragment";
     private static final String FLOW_FRAGMENT_TAG = "flow_fragment";
@@ -65,6 +68,10 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     private SimpleExoPlayer mPlayer;
 
     private long mCurrentPlayerPosition = 0;
+    private boolean mPlayWhenReady = true;
+    private int mCurrentPosition = 0;
+
+    private boolean flag = false;
 
     @BindView(R.id.tv_step_long_description)
     TextView mStepDescription;
@@ -90,10 +97,11 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
 
 
         if(callingIntent.hasExtra(CURRENT_ID)){
-            mCurrentPosition = callingIntent.getIntExtra(CURRENT_ID , 0);
-            Log.d(LOG_TAG , "the intent value Id " + Integer.toString(mCurrentPosition));
+            flag = true;
+            mCurrentID = callingIntent.getIntExtra(CURRENT_ID , 0);
         }
         if(callingIntent.hasExtra(CURRENT_RECIPE_ID)){
+            flag = true;
             mCurrentRecipeId = callingIntent.getIntExtra(CURRENT_RECIPE_ID , -1);
             Log.d(LOG_TAG , "Current Recipe Id is " + mCurrentRecipeId);
         }
@@ -103,11 +111,14 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
             if(savedInstanceState.containsKey(CURRENT_PLAYER_POSITION)){
                 mCurrentPlayerPosition = savedInstanceState.getLong(CURRENT_PLAYER_POSITION, 0);
             }
-            if(savedInstanceState.containsKey(CURRENT_ID)){
-                mCurrentPosition = savedInstanceState.getInt(CURRENT_ID);
+            if(savedInstanceState.containsKey(STEP_ID)){
+                mCurrentPosition = savedInstanceState.getInt(STEP_ID);
             }
             if(savedInstanceState.containsKey(CURRENT_RECIPE_ID)){
                 mCurrentRecipeId = savedInstanceState.getInt(CURRENT_RECIPE_ID);
+            }
+            if(savedInstanceState.containsKey(PLAY_IF_READY)){
+                mPlayWhenReady = savedInstanceState.getBoolean(PLAY_IF_READY);
             }
         }
 
@@ -180,9 +191,9 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         }else{
             mCurrentPosition--;
         }
+        mCurrentPlayerPosition = 0;
         changeButtons();
         populateData();
-        preparePlayerMediaSource();
     }
 
     private void returnToPrevious(){
@@ -192,9 +203,9 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         }else{
             mCurrentPosition++;
         }
+        mCurrentPlayerPosition = 0;
         changeButtons();
         populateData();
-        preparePlayerMediaSource();
     }
 
     private void changeButtons(){
@@ -217,16 +228,22 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         if(mPlayer == null) {
             mPlayer = ExoPlayerFactory.newSimpleInstance(this,
                     new DefaultTrackSelector(), new DefaultLoadControl());
-
-            mPlayer.setPlayWhenReady(true);
+            preparePlayerMediaSource();
+            mPlayer.setPlayWhenReady(mPlayWhenReady);
             mExoPlayerView.setPlayer(mPlayer);
+        }else{
+            preparePlayerMediaSource();
+            mPlayer.setPlayWhenReady(mPlayWhenReady);
         }
+//        }else{
+//            mPlayer.setPlayWhenReady(mPlayWhenReady);
+//            mPlayer.seekTo(mCurrentPlayerPosition);
+//            mExoPlayerView.setPlayer(mPlayer);
+//        }
     }
 
     private void preparePlayerMediaSource(){
-        if(mPlayer == null) return;
         mPlayer.stop();
-        Log.d(LOG_TAG , "This is the current Position " + mCurrentPosition);
         mRecipeSteps.moveToPosition(mCurrentPosition);
 
         Uri videoUri = NetworkUtils.buildVideoUri(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.VIDEO_COL)));
@@ -242,7 +259,7 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void populateData(){
-        if(mRecipeSteps == null) return;
+        if( mRecipeSteps == null) return;
         mRecipeSteps.moveToPosition(mCurrentPosition);
         mStepDescription.setText(mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.DESCRIPTION_COL)));
         String videoValue = mRecipeSteps.getString(mRecipeSteps.getColumnIndex(DataContract.StepEntry.VIDEO_COL));
@@ -253,6 +270,7 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
             mExoPlayerView.setVisibility(View.VISIBLE);
             mNoVideoImage.setVisibility(View.INVISIBLE);
         }
+        initializeExoPlayer();
         changeButtons();
     }
 
@@ -271,12 +289,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
         mPlayer.stop();
         mPlayer.release();
         mPlayer = null;
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        releasePlayer();
     }
 
     @NonNull
@@ -380,7 +392,6 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
                 }else{
                     populateData();
                 }
-                preparePlayerMediaSource();
             }else{
                 Log.d(LOG_TAG , "The whole Steps Cursor data is null");
             }
@@ -422,35 +433,38 @@ public class StepDetailActivity extends AppCompatActivity implements LoaderManag
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putLong(CURRENT_PLAYER_POSITION, mCurrentPlayerPosition);
+        outState.putInt(STEP_ID , mCurrentPosition);
+        outState.putBoolean(PLAY_IF_READY , mPlayWhenReady);
+        outState.putInt(CURRENT_RECIPE_ID , mCurrentRecipeId);
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onPause() {
-        if(mPlayer != null){
-            mCurrentPlayerPosition = mPlayer.getCurrentPosition();
-        }
-        releasePlayer();
-        super.onPause();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        initializeExoPlayer();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initializeExoPlayer();
         getSupportLoaderManager().restartLoader(RECIPE_INGREDIENTS_LOADER_ID , null  , this);
         getSupportLoaderManager().restartLoader(RECIPE_STEPS_LOADER_ID , null , this);
+        //initializeExoPlayer();
+    }
+
+    @Override
+    protected void onPause() {
+        mCurrentPlayerPosition = mPlayer.getCurrentPosition();
+        mPlayWhenReady = mPlayer.getPlayWhenReady();
+        super.onPause();
+        if (Util.SDK_INT <= 23) {
+            // release player
+            releasePlayer();
+        }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        releasePlayer();
+        if (Util.SDK_INT > 23) {
+            // release player
+            releasePlayer();
+        }
     }
+
 }

@@ -29,6 +29,7 @@ import com.example.amira.bakingapp.data.StepIdlingResource;
 import com.example.amira.bakingapp.models.Ingredient;
 import com.example.amira.bakingapp.models.Recipe;
 import com.example.amira.bakingapp.models.Step;
+import com.example.amira.bakingapp.widgets.IngredientsIntentService;
 import com.squareup.picasso.Picasso;
 
 import butterknife.BindView;
@@ -37,18 +38,22 @@ import butterknife.ButterKnife;
 public class RecipeDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , StepsAdapter.onItemClickHandler{
 
     private static final String LOG_TAG = RecipeDetailActivity.class.getSimpleName();
+    public static final String ACTION_UPDATE_WIDGET = "com.example.amira.bakingapp.action.update_widget";
 
     private static final int INGREDIENTS_LOADER_ID = 701;
     private static final int STEPS_LOADER_ID = 702;
 
     private static final String CURRENT_ID = "currentPosition";
     private static final String CURRENT_RECIPE_ID = "currentRecipeId";
-
     private int mCurrentRecipeId;
+    private String mCurrentRecipeName;
     private Cursor mIngredientCursor , mStepsCursor;
 
     private StepsAdapter mStepsAdapter;
     private IngredientsAdapter mIngredientsAdapter;
+
+    // The extra sent to the intent service
+    private static final String RECIPE_ID = "recipeId";
 
 
     @BindView(R.id.rv_recipe_ingredients)
@@ -60,10 +65,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
     @BindView(R.id.recipe_image)
     ImageView mRecipeImage;
 
-    AppDatabase db;
-
-    @Nullable private StepIdlingResource resource;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,13 +75,11 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
         if(callingIntent.hasExtra(Intent.EXTRA_TEXT)){
             mCurrentRecipeId = callingIntent.getIntExtra(Intent.EXTRA_TEXT , -1);
         }
+        if(callingIntent.hasExtra(MainActivity.RECIPE_NAME_EXTRA)){
+            mCurrentRecipeName = callingIntent.getStringExtra(MainActivity.RECIPE_NAME_EXTRA);
+        }
 
         ButterKnife.bind(this);
-
-        db = AppDatabase.getsInstance(this);
-
-        Log.d(LOG_TAG , "The steps is  " + db.stepDao().count());
-        Log.d(LOG_TAG , "The in is " + db.ingredientDao().count());
 
         int imageIndex = mCurrentRecipeId - 1;
         if(imageIndex >= 0 && imageIndex < 4){
@@ -181,10 +180,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
                 protected void onStartLoading() {
                     super.onStartLoading();
 
-                    if(resource != null){
-                        resource.setIdleState(false);
-                    }
-
                     if(mStepData != null){
                         deliverResult(mStepData);
                     }else{
@@ -242,9 +237,6 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
             }else{
                 Log.d(LOG_TAG , "Steps Null");
             }
-            if(resource != null){
-                resource.setIdleState(true);
-            }
         }else{
             Log.d(LOG_TAG  , "Invalid Loader ID in onLoadFinished");
         }
@@ -284,5 +276,16 @@ public class RecipeDetailActivity extends AppCompatActivity implements LoaderMan
 
     private void updateWidget(){
         Toast.makeText(this , "Menu Item Clicked" , Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this,IngredientsIntentService.class);
+        intent.setAction(ACTION_UPDATE_WIDGET);
+        intent.putExtra(RECIPE_ID , mCurrentRecipeId);
+        intent.putExtra(MainActivity.RECIPE_NAME_EXTRA , mCurrentRecipeName);
+        Log.d("WidgetTrace" , "Intent Started");
+        startService(intent);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
     }
 }

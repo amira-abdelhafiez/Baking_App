@@ -12,4 +12,5 @@
     <string name="configure">Configure</string>
     <string name="widget_empty">Empty</string>
     <string name="add_to_widget">Add To Widget </string>
+    <string name="empty_list_widget_text">This List Is Empty</string>
 </resources>

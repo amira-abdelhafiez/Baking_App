@@ -33,12 +33,12 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 
     // Room
-
-    implementation "android.arch.persistence.room:runtime:1.0.0"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0"
+    implementation 'android.arch.persistence.room:runtime:1.0.0'
+    annotationProcessor 'android.arch.persistence.room:compiler:1.0.0'
 
     // Exo player
     implementation 'com.google.android.exoplayer:exoplayer:r2.2.0'
+
     // Picasso
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
